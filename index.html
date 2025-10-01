@@ -61,8 +61,6 @@
 
     /* Toast */
     .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 14px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.2);font-size:14px;z-index:50}
-    .spinner{display:inline-block;width:16px;height:16px;border:2px solid #e5e7eb;border-top-color:#111827;border-radius:50%;animation:spin 1s linear infinite;margin-right:8px}
-    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
@@ -70,7 +68,7 @@
     <div class="app" id="app">
       <header>
         <div class="brand">
-          <!-- Your exact logo URL with graceful fallback -->
+          <!-- Exact logo URL provided by you, with fallback -->
           <img id="logo" alt="Fnac Darty" src="https://static.publicocdn.com/files/site/assets/img/commercial/fnac-logo.png" onerror="this.onerror=null;this.src='https://upload.wikimedia.org/wikipedia/commons/0/0b/Fnac_Logo.svg'" />
           <span class="badge">Clienteling</span>
         </div>
@@ -85,6 +83,7 @@
           <div class="searchRow">
             <input id="q" type="text" placeholder="Rechercher par email (fnac/darty)" autocomplete="off" />
             <button id="btnNew" class="newBtn">Nouveau contact</button>
+            <button id="btnPing" class="ghost" style="margin-left:6px">Tester API</button>
           </div>
           <div id="sug" class="suggestions"></div>
 
@@ -164,6 +163,19 @@
   </div>
 
   <script>
+    // Delay init until DOM is ready and bind listeners safely
+    function onReady(fn){
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', fn, {once:true});
+      else fn();
+    }
+
+    // Global runtime error trap for visibility
+    window.addEventListener('error', (e)=>{
+      console.error('JS Error:', e.message, e.filename, e.lineno);
+      const t=document.getElementById('toast');
+      t.textContent = 'Erreur JS: '+e.message; t.classList.remove('hidden');
+      clearTimeout(t._h); t._h=setTimeout(()=>t.classList.add('hidden'), 4000);
+    });
     // === CONFIG ===
     const API_BASE = 'https://fnacdarty-demo.poc2.imagino.com/ucdapi/Exposition_RCU/V1';
     const API_KEY  = 'c92ad264-f863-4f56-8e9e-22da8f8450a1';
@@ -181,55 +193,44 @@
     };
 
     // Toast helper
-    const toast = (msg, ms=3500)=>{
-      const t=$('#toast'); t.innerHTML=msg; t.classList.remove('hidden');
+    const toast = (msg, ms=3000)=>{
+      const t=$('#toast'); t.textContent=msg; t.classList.remove('hidden');
       clearTimeout(t._h); t._h=setTimeout(()=>t.classList.add('hidden'), ms);
     };
 
-    // Debounce helper
-    const debounce=(fn,ms)=>{let h;return(...args)=>{clearTimeout(h);h=setTimeout(()=>fn(...args),ms)}};
+    // === SEARCH (V1 behaviour: list + client-side filter) — with stronger headers + visible debug ===
+    const debug = new URLSearchParams(location.search).has('debug');
+    const log = (...args)=>{ if(debug) console.log('[Clienteling]', ...args); };
 
-    // Search-as-you-type with graceful fallbacks
-    const doSearch = async (q)=>{
+    async function performSearch(q){
       const sug = $('#sug');
       sug.innerHTML='';
-      if(q.length<3){
-        const div=document.createElement('div'); div.className='sug-empty';
-        div.textContent='Tape au moins 3 caractères'; sug.appendChild(div);
-        showAppBody(false);
-        return;
-      }
-
-      // show spinner row
-      const spin=document.createElement('div'); spin.className='sug-empty';
-      spin.innerHTML='<span class="spinner"></span>Recherche…';
-      sug.appendChild(spin);
+      if(!q){ showAppBody(false); return; }
 
       try{
-        let hits=[];
-        // 1) Try a hypothetical server-side search endpoint (if available on your UCD)
-        let res = await fetch(`${API_BASE}/RCU_Fnac_2/search?email=${encodeURIComponent(q)}&limit=50`,{
-          headers:{'X-API-KEY': API_KEY,'x-api-key':API_KEY,'Authorization':`Bearer ${API_KEY}`}
+        log('Fetching list…', `${API_BASE}/RCU_Fnac_2?limit=10000`);
+        const res = await fetch(`${API_BASE}/RCU_Fnac_2?limit=10000`, {
+          headers:{
+            'X-API-KEY': API_KEY,
+            'x-api-key': API_KEY,
+            'Authorization': `Bearer ${API_KEY}`
+          }
         });
-        if(res.ok){
-          const js = await res.json();
-          hits = (js && (js.data||js.results||[])) || [];
-        } else if(res.status===404){
-          // 2) Fallback to list + client-side filter
-          res = await fetch(`${API_BASE}/RCU_Fnac_2?limit=10000`,{headers:{'X-API-KEY': API_KEY,'x-api-key':API_KEY}});
-          const js = await res.json();
-          const arr = (js && js.data) ? js.data : [];
-          hits = arr.filter(x=> (x.email||'').toLowerCase().includes(q)).slice(0,50);
-        } else {
-          throw new Error(`HTTP ${res.status}`);
-        }
+        log('Response status', res.status);
+        if(!res.ok){ throw new Error('HTTP '+res.status); }
+        const js = await res.json();
+        const arr = (js && js.data) ? js.data : [];
+        log('Total records', arr.length);
+        const LQ = q.toLowerCase();
+        const hits = arr.filter(x=> (x.email||'').toLowerCase().includes(LQ)).slice(0,50);
+        log('Hits', hits.length);
 
-        sug.innerHTML='';
         if(!hits.length){
           const div=document.createElement('div'); div.className='sug-empty';
           div.textContent='Aucun résultat'; sug.appendChild(div);
           showAppBody(false); return;
         }
+
         hits.forEach(x=>{
           const div = document.createElement('div');
           div.textContent = `${x.firstName||''} ${x.lastName||''} — ${x.email||''}`;
@@ -243,19 +244,44 @@
         });
       }catch(err){
         console.error(err);
-        sug.innerHTML='';
         const div=document.createElement('div'); div.className='sug-empty';
-        div.textContent='Erreur de recherche'; sug.appendChild(div);
-        toast("Impossible de joindre l'API (CORS / réseau). Ouvre le fichier via un serveur local ou autorise le domaine dans CORS.");
+        div.textContent=`Erreur de recherche: ${err.message}`; sug.appendChild(div);
+        toast("Impossible de joindre l'API (CORS / réseau). Ouvre depuis http://localhost ou autorise l'origine.");
         showAppBody(false);
       }
-    };
+    }
 
-    $('#q').addEventListener('input', debounce((e)=>{
-      const q = e.target.value.trim().toLowerCase();
-      if(!q){ showAppBody(false); $('#sug').innerHTML=''; return; }
-      doSearch(q);
-    }, 250));
+    // Bind inputs safely once DOM is ready
+    onReady(()=>{
+      const qEl = $('#q');
+      if(qEl){
+        qEl.addEventListener('input', (e)=>{
+          const q = e.target.value.trim();
+          console.log('input change', q);
+          performSearch(q);
+        });
+        qEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ performSearch(e.target.value.trim()); }});
+      } else {
+        console.warn('Input #q not found');
+      }
+
+      const pingBtn = $('#btnPing');
+      if(pingBtn){
+        pingBtn.addEventListener('click', async ()=>{
+          try{
+            const url = `${API_BASE}/RCU_Fnac_2?limit=1&_=${Date.now()}`;
+            console.log('PING', url);
+            const res = await fetch(url, { headers:{ 'X-API-KEY': API_KEY, 'x-api-key': API_KEY, 'Authorization': `Bearer ${API_KEY}` }});
+            console.log('PING status', res.status);
+            if(!res.ok) throw new Error('HTTP '+res.status);
+            const js = await res.json();
+            toast('API OK — '+((js&&js.data&&js.data.length)||0)+' enregistrements');
+          }catch(err){ console.error(err); toast('API KO: '+err.message); }
+        });
+      } else {
+        console.warn('Button #btnPing not found');
+      }
+    });
 
     // Populate UI
     function loadRecord(rec){
@@ -306,91 +332,136 @@
     }
     function safe(v){ return (v===undefined||v===null)?'':String(v); }
 
-    // Edit/Save profile (upsert via POST /RCU_Fnac_2)
-    $('#btnEdit').addEventListener('click', ()=>{
-      setRO(false);
-      $('#btnEdit').style.display='none';
-      $('#btnSave').style.display='inline-block';
-      $('#btnCancel').style.display='inline-block';
-    });
-    $('#btnCancel').addEventListener('click', ()=>{
-      setRO(true);
-      $('#btnEdit').style.display='inline-block';
-      $('#btnSave').style.display='none';
-      $('#btnCancel').style.display='none';
-    });
-    $('#btnSave').addEventListener('click', async ()=>{
-      const payload = {
-        firstName: $('#firstName').value.trim(),
-        lastName:  $('#lastName').value.trim(),
-        email:     $('#email').value.trim(),
-        mobile:    $('#mobile').value.trim(),
-        Store_ID:  $('#storeId').textContent.trim(),
-        city:      $('#city').textContent.trim(),
-        zipCode:   $('#zip').textContent.trim(),
-        optInEmail: $('#optEmail').value.toLowerCase()==='oui',
-        optInSMS:   $('#optSMS').value.toLowerCase()==='oui',
-        optInPush:  $('#optPush').value.toLowerCase()==='oui'
-      };
-      try{
-        const res = await fetch(`${API_BASE}/RCU_Fnac_2`,{
-          method:'POST',
-          headers:{'Content-Type':'application/json','X-API-KEY':API_KEY,'x-api-key':API_KEY,'Authorization':`Bearer ${API_KEY}`},
-          body: JSON.stringify(payload)
-        });
-        if(!res.ok){
-          const t = await res.text();
-          alert('Échec de la sauvegarde: '+t);
-          return;
-        }
-        toast('Profil enregistré.');
+    // Bind the rest of the UI safely after DOM is ready too
+    onReady(()=>{
+      // Edit/Save profile (upsert via POST /RCU_Fnac_2)
+      const btnEdit = $('#btnEdit');
+      const btnSave = $('#btnSave');
+      const btnCancel = $('#btnCancel');
+      if(btnEdit) btnEdit.addEventListener('click', ()=>{
+        setRO(false);
+        btnEdit.style.display='none';
+        btnSave.style.display='inline-block';
+        btnCancel.style.display='inline-block';
+      });
+      if(btnCancel) btnCancel.addEventListener('click', ()=>{
         setRO(true);
-        $('#btnEdit').style.display='inline-block';
-        $('#btnSave').style.display='none';
-        $('#btnCancel').style.display='none';
-      }catch(e){ console.error(e); toast('Erreur réseau.'); }
-    });
+        btnEdit.style.display='inline-block';
+        btnSave.style.display='none';
+        btnCancel.style.display='none';
+      });
+      if(btnSave) btnSave.addEventListener('click', async ()=>{
+        const payload = {
+          firstName: $('#firstName').value.trim(),
+          lastName:  $('#lastName').value.trim(),
+          email:     $('#email').value.trim(),
+          mobile:    $('#mobile').value.trim(),
+          Store_ID:  $('#storeId').textContent.trim(),
+          city:      $('#city').textContent.trim(),
+          zipCode:   $('#zip').textContent.trim(),
+          optInEmail: $('#optEmail').value.toLowerCase()==='oui',
+          optInSMS:   $('#optSMS').value.toLowerCase()==='oui',
+          optInPush:  $('#optPush').value.toLowerCase()==='oui'
+        };
+        try{
+          const res = await fetch(`${API_BASE}/RCU_Fnac_2`,{
+            method:'POST',
+            headers:{'Content-Type':'application/json','X-API-KEY':API_KEY},
+            body: JSON.stringify(payload)
+          });
+          if(!res.ok){
+            const t = await res.text();
+            alert('Échec de la sauvegarde: '+t);
+            return;
+          }
+          toast('Profil enregistré.');
+          setRO(true);
+          btnEdit.style.display='inline-block';
+          btnSave.style.display='none';
+          btnCancel.style.display='none';
+        }catch(e){ console.error(e); toast('Erreur réseau.'); }
+      });
 
-    // New contact bubble logic
-    const bubble = $('#createBubble');
-    const openBubble = ()=>{ bubble.classList.remove('hidden'); $('#cFirst').focus(); };
-    const closeBubble = ()=>{ bubble.classList.add('hidden'); };
+      // New contact bubble logic
+      const bubble = $('#createBubble');
+      const btnNew = $('#btnNew');
+      const bubbleClose = $('#bubbleClose');
+      const bubbleCreate = $('#bubbleCreate');
+      const openBubble = ()=>{ if(bubble){ bubble.classList.remove('hidden'); const f=$('#cFirst'); if(f) f.focus(); } };
+      const closeBubble = ()=>{ if(bubble){ bubble.classList.add('hidden'); } };
 
-    $('#btnNew').addEventListener('click', ()=>{
-      // Reset fields each open
-      ['cFirst','cLast','cEmail','cMobile'].forEach(id=>$('#'+id).value='');
-      openBubble();
-    });
-    $('#bubbleClose').addEventListener('click', closeBubble);
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeBubble(); });
-    document.addEventListener('click', (e)=>{ if(!bubble.classList.contains('hidden') && !bubble.contains(e.target) && e.target.id!=='btnNew'){ closeBubble(); }});
-
-    // Create from bubble
-    $('#bubbleCreate').addEventListener('click', async ()=>{
-      const payload = {
-        firstName: $('#cFirst').value.trim(),
-        lastName:  $('#cLast').value.trim(),
-        email:     $('#cEmail').value.trim(),
-        mobile:    $('#cMobile').value.trim(),
-        createdDate: new Date().toISOString()
-      };
-      if(!payload.email){ toast('Email requis.'); return; }
-      try{
-        const res = await fetch(`${API_BASE}/RCU_Fnac_2`,{
-          method:'POST',
-          headers:{'Content-Type':'application/json','X-API-KEY':API_KEY,'x-api-key':API_KEY,'Authorization':`Bearer ${API_KEY}`},
-          body: JSON.stringify(payload)
-        });
-        if(!res.ok){
-          const t = await res.text();
-          toast('Création impossible: '+t);
-          return;
+      if(btnNew) btnNew.addEventListener('click', ()=>{
+        ['cFirst','cLast','cEmail','cMobile'].forEach(id=>{ const el=$('#'+id); if(el) el.value=''; });
+        openBubble();
+      });
+      if(bubbleClose) bubbleClose.addEventListener('click', closeBubble);
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeBubble(); });
+      document.addEventListener('click', (e)=>{
+        if(!bubble) return; // safety
+        if(!bubble.classList.contains('hidden') && !bubble.contains(e.target) && e.target.id!=='btnNew'){
+          closeBubble();
         }
-        toast('Contact créé.');
-        closeBubble();
-        $('#q').value = payload.email;
-        doSearch(payload.email.toLowerCase());
-      }catch(e){ console.error(e); toast('Erreur réseau.'); }
+      });
+
+      if(bubbleCreate) bubbleCreate.addEventListener('click', async ()=>{
+        const cFirst=$('#cFirst'), cLast=$('#cLast'), cEmail=$('#cEmail'), cMobile=$('#cMobile');
+        const payload = {
+          firstName: cFirst? cFirst.value.trim(): '',
+          lastName:  cLast? cLast.value.trim(): '',
+          email:     cEmail? cEmail.value.trim(): '',
+          mobile:    cMobile? cMobile.value.trim(): '',
+          createdDate: new Date().toISOString()
+        };
+        if(!payload.email){ toast('Email requis.'); return; }
+        try{
+          const res = await fetch(`${API_BASE}/RCU_Fnac_2`,{
+            method:'POST',
+            headers:{'Content-Type':'application/json','X-API-KEY':API_KEY},
+            body: JSON.stringify(payload)
+          });
+          if(!res.ok){
+            const t = await res.text();
+            toast('Création impossible: '+t);
+            return;
+          }
+          toast('Contact créé.');
+          closeBubble();
+          const qEl=$('#q'); if(qEl){ qEl.value = payload.email; qEl.dispatchEvent(new Event('input')); }
+        }catch(e){ console.error(e); toast('Erreur réseau.'); }
+      });
+    });
+      if(bubbleClose) bubbleClose.addEventListener('click', closeBubble);
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeBubble(); });
+      document.addEventListener('click', (e)=>{ if(!bubble.classList.contains('hidden') && !bubble.contains(e.target) && e.target.id!=='btnNew'){ closeBubble(); }});
+
+      if(bubbleCreate) bubbleCreate.addEventListener('click', async ()=>{
+        const payload = {
+          firstName: $('#cFirst').value.trim(),
+          lastName:  $('#cLast').value.trim(),
+          email:     $('#cEmail').value.trim(),
+          mobile:    $('#cMobile').value.trim(),
+          createdDate: new Date().toISOString()
+        };
+        if(!payload.email){ toast('Email requis.'); return; }
+        try{
+          const res = await fetch(`${API_BASE}/RCU_Fnac_2`,{
+            method:'POST',
+            headers:{'Content-Type':'application/json','X-API-KEY':API_KEY},
+            body: JSON.stringify(payload)
+          });
+          if(!res.ok){
+            const t = await res.text();
+            toast('Création impossible: '+t);
+            return;
+          }
+          toast('Contact créé.');
+          closeBubble();
+          $('#q').value = payload.email;
+          // retrigger a search using the same simple logic
+          const evt = new Event('input');
+          $('#q').dispatchEvent(evt);
+        }catch(e){ console.error(e); toast('Erreur réseau.'); }
+      });
     });
   </script>
 </body>
