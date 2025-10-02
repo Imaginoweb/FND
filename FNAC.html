@@ -3,395 +3,383 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fnac Darty — Clienteling</title>
+  <title>Fnac Darty – Clienteling</title>
+  <link rel="icon" href="https://static.publicocdn.com/files/site/assets/img/commercial/fnac-logo.png" />
   <style>
     :root{
-      --fnac-yellow:#FFD400; /* Fnac */
-      --fnac-black:#000000;
-      --darty-red:#E60012;   /* Darty */
-      --ink:#0d0f14;
+      --brand:#000;          /* noir Fnac */
+      --accent:#ffd200;      /* jaune Fnac */
+      --bg:#f6f6f6;
+      --ink:#111;
       --muted:#6b7280;
-      --bg:#f6f7f9;
-      --card:#ffffff;
-      --radius:20px;
+      --card:#fff;
+      --radius:18px;
+      --shadow:0 8px 24px rgba(0,0,0,.08);
     }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;color:var(--ink)}
-    .ipad{width:1366px;max-width:100vw;height:100vh;max-height:100vh;margin:auto;padding:20px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--fnac-yellow),#fff4a6)}
-    .app{width:100%;height:100%;background:var(--card);border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.15);display:flex;flex-direction:column}
-    header{display:flex;align-items:center;gap:16px;padding:18px 22px;border-bottom:1px solid #e5e7eb}
-    header .brand{display:flex;align-items:center;gap:12px}
-    header .brand img{height:38px}
-    .badge{font-weight:700;padding:4px 10px;border-radius:999px;background:var(--fnac-black);color:#fff}
-    .right{margin-left:auto;display:flex;gap:16px;align-items:center;color:var(--muted);font-size:14px}
-    .content{display:grid;grid-template-columns:380px 1fr;gap:20px;padding:20px;height:100%;overflow:hidden}
-    .panel{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:16px;display:flex;flex-direction:column;min-height:0;position:relative}
-    .searchRow{display:flex;gap:10px;align-items:center}
-    .searchRow input{flex:1;padding:14px;border:1px solid #d1d5db;border-radius:12px;font-size:16px}
-    .searchRow .newBtn{white-space:nowrap;appearance:none;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer;background:var(--fnac-black);color:#fff}
-    .suggestions{margin-top:10px;border:1px solid #e5e7eb;border-radius:12px;overflow:auto;max-height:40vh}
-    .suggestions div{padding:10px 12px;cursor:pointer}
-    .suggestions div:hover{background:#f3f4f6}
-    .sug-empty{padding:10px 12px;color:var(--muted)}
-    .hidden{display:none}
-    .group-title{font-weight:700;margin:16px 4px 8px;color:#111827}
-    .field{display:flex;align-items:center;gap:10px;margin:8px 0}
-    .field label{width:140px;color:#374151;font-size:14px}
-    .field input,.field .ro{flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:10px;background:#fafafa}
-    .field input[readonly]{background:#f9fafb;color:#111827}
-    .actions{display:flex;gap:10px;margin-top:auto}
-    button{appearance:none;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
-    .primary{background:var(--fnac-black);color:#fff}
-    .ghost{background:#eef2ff;color:#111827}
-    .danger{background:var(--darty-red);color:#fff}
-    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
-    .card{grid-column:span 12;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:16px;min-height:0}
-    .card h3{margin:0 0 10px 0}
-    .kv{display:grid;grid-template-columns:160px 1fr;gap:8px;font-size:14px}
-    .table{width:100%;border-collapse:collapse}
-    .table th,.table td{border-bottom:1px solid #e5e7eb;padding:10px;text-align:left;font-size:14px}
-    .pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#f3f4f6;font-size:12px}
-    .footer{padding:10px 16px;color:var(--muted);font-size:12px;border-top:1px solid #e5e7eb}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background:var(--bg); color:var(--ink);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .app{
+      width:min(1280px, 96vw); height:min(820px, 92vh);
+      background:linear-gradient(160deg, #fff, #fff 60%, #fff2);
+      border-radius:28px; box-shadow:var(--shadow);
+      overflow:hidden; display:grid; grid-template-rows:84px 1fr;
+      border:1px solid #e5e7eb;
+    }
+    .topbar{
+      display:flex; align-items:center; gap:16px; padding:16px 20px; background:#fff; border-bottom:1px solid #eee;
+    }
+    .logo{height:44px}
+    .searchwrap{margin-left:auto; display:flex; align-items:center; gap:10px}
+    .search{
+      width:520px; max-width:64vw; height:44px; border:1.5px solid #ddd; border-radius:999px; padding:0 16px 0 48px; outline:none; font-size:16px; background:#fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>') no-repeat 14px center;
+      transition:border-color .2s, box-shadow .2s
+    }
+    .search:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(255,210,0,.25)}
+    .btn{height:44px; padding:0 14px; border-radius:999px; border:1.5px solid var(--brand); background:var(--brand); color:#fff; font-weight:600; cursor:pointer}
+    .btn:hover{opacity:.9}
+    .btn-secondary{background:#fff; color:var(--brand)}
 
-    /* Bubble (popover) */
-    .bubble{position:absolute;top:64px;right:16px;width:360px;background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 10px 25px rgba(0,0,0,.15);padding:14px;z-index:10}
-    .bubble:before{content:"";position:absolute;top:-10px;right:28px;border-width:0 10px 10px 10px;border-style:solid;border-color:transparent transparent #e5e7eb transparent}
-    .bubble:after{content:"";position:absolute;top:-8px;right:28px;border-width:0 10px 10px 10px;border-style:solid;border-color:transparent transparent #fff transparent}
-    .bubble h4{margin:4px 0 8px 0}
+    /* Suggestions */
+    .suggest{position:absolute; top:70px; right:20px; width:min(640px, 92vw); background:#fff; border:1px solid #eee; border-radius:16px; box-shadow:var(--shadow); overflow:hidden; display:none}
+    .s-item{padding:12px 14px; display:flex; gap:12px; align-items:center; cursor:pointer}
+    .s-item:hover{background:#fafafa}
+    .badge{font-size:12px; padding:2px 8px; border-radius:999px; background:var(--accent); color:#111; font-weight:700}
+    .muted{color:var(--muted)}
 
-    /* Toast */
-    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 14px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.2);font-size:14px;z-index:50}
-    .spinner{display:inline-block;width:16px;height:16px;border:2px solid #e5e7eb;border-top-color:#111827;border-radius:50%;animation:spin 1s linear infinite;margin-right:8px}
-    @keyframes spin{to{transform:rotate(360deg)}}
+    .layout{display:grid; grid-template-columns:1fr 1fr; gap:18px; padding:18px; height:100%;}
+    .card{background:var(--card); border:1px solid #eee; border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); display:none}
+    .card.show{display:block}
+    .card h3{margin:0 0 12px; font-size:18px}
+    .kv{display:grid; grid-template-columns:180px 1fr; gap:10px; align-items:center}
+    .kv input, .kv select{height:38px; padding:0 10px; border:1px solid #e5e7eb; border-radius:10px; outline:none}
+    .kv input[readonly]{background:#fafafa}
+    .row{display:flex; gap:10px}
+    .row .btn{height:36px}
+
+    .table{width:100%; border-collapse:collapse}
+    .table th,.table td{padding:10px 8px; border-bottom:1px solid #eee; text-align:left}
+    .pill{display:inline-block; padding:2px 8px; border-radius:999px; background:#f3f4f6}
+
+    .empty{height:100%; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; color:var(--muted)}
+    .empty svg{width:72px; height:72px}
+
+    /* Modal */
+    .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none}
+    .modal{position:fixed; inset:0; display:grid; place-items:center; pointer-events:none}
+    .sheet{width:min(560px, 92vw); background:#fff; border-radius:20px; box-shadow:var(--shadow); padding:18px; transform:translateY(20px); opacity:0; transition:.2s}
+    .modal.show{pointer-events:auto}
+    .modal.show .modal-backdrop{display:block}
+    .modal.show .sheet{transform:none; opacity:1}
+    .sheet h3{margin:0 0 12px}
+    .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    .grid .full{grid-column:1 / -1}
   </style>
 </head>
 <body>
-  <div class="ipad">
-    <div class="app" id="app">
-      <header>
-        <div class="brand">
-          <!-- Your exact logo URL with graceful fallback -->
-          <img id="logo" alt="Fnac Darty" src="https://static.publicocdn.com/files/site/assets/img/commercial/fnac-logo.png" onerror="this.onerror=null;this.src='https://upload.wikimedia.org/wikipedia/commons/0/0b/Fnac_Logo.svg'" />
-          <span class="badge">Clienteling</span>
-        </div>
-        <div class="right">
-          <span id="who">Conseiller·ère : —</span>
-        </div>
-      </header>
+  <div class="app">
+    <header class="topbar">
+      <img class="logo" src="https://static.publicocdn.com/files/site/assets/img/commercial/fnac-logo.png" alt="Fnac Darty" />
+      <div class="searchwrap" style="position:relative">
+        <input id="q" class="search" placeholder="Rechercher par email, prénom, nom…" autocomplete="off" />
+        <button id="newBtn" class="btn" title="Créer un nouveau contact">Nouveau contact</button>
 
-      <div class="content">
-        <!-- LEFT: Search & profile -->
-        <section class="panel" id="leftPanel">
-          <div class="searchRow">
-            <input id="q" type="text" placeholder="Rechercher par email (fnac/darty)" autocomplete="off" />
-            <button id="btnNew" class="newBtn">Nouveau contact</button>
-          </div>
-          <div id="sug" class="suggestions"></div>
-
-          <!-- Everything below stays hidden until a record is loaded -->
-          <div id="leftBody" class="hidden">
-            <div class="group-title">Profil</div>
-            <div class="field"><label>Prénom</label><input id="firstName" readonly></div>
-            <div class="field"><label>Nom</label><input id="lastName" readonly></div>
-            <div class="field"><label>Email</label><input id="email" readonly></div>
-            <div class="field"><label>Téléphone</label><input id="mobile" readonly></div>
-            <div class="field"><label>Magasin favori</label><input id="favStore" class="ro" readonly></div>
-            <div class="field"><label>Statut fidélité</label><input id="fid" class="ro" readonly></div>
-            <div class="field"><label>RFM</label><input id="rfm" class="ro" readonly></div>
-            <div class="field"><label>Opt-in Email</label><input id="optEmail" class="ro" readonly></div>
-            <div class="field"><label>Opt-in SMS</label><input id="optSMS" class="ro" readonly></div>
-            <div class="field"><label>Opt-in Push</label><input id="optPush" class="ro" readonly></div>
-
-            <div class="actions">
-              <button class="ghost" id="btnEdit">Modifier</button>
-              <button class="primary" id="btnSave" style="display:none">Enregistrer</button>
-              <button class="danger" id="btnCancel" style="display:none">Annuler</button>
-            </div>
-          </div>
-
-          <!-- Create bubble -->
-          <div id="createBubble" class="bubble hidden" role="dialog" aria-modal="true" aria-labelledby="bubbleTitle">
-            <h4 id="bubbleTitle">Nouveau contact</h4>
-            <div class="field"><label>Prénom</label><input id="cFirst"></div>
-            <div class="field"><label>Nom</label><input id="cLast"></div>
-            <div class="field"><label>Email</label><input id="cEmail"></div>
-            <div class="field"><label>Mobile</label><input id="cMobile"></div>
-            <div class="actions">
-              <button class="primary" id="bubbleCreate">Créer</button>
-              <button class="ghost" id="bubbleClose">Fermer</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- RIGHT: Insights (hidden until a record is loaded) -->
-        <section class="panel hidden" id="rightPanel" style="overflow:auto">
-          <div class="grid">
-            <div class="card" id="summary">
-              <h3>Résumé client</h3>
-              <div class="kv">
-                <div>CA Omnicanal (€)</div><div id="ca">—</div>
-                <div>Classification</div><div id="classif">—</div>
-                <div>Ville</div><div id="city">—</div>
-                <div>Code postal</div><div id="zip">—</div>
-                <div>Date de naissance</div><div id="dob">—</div>
-                <div>Store ID</div><div id="storeId">—</div>
-              </div>
-            </div>
-
-            <div class="card" id="recent">
-              <h3>3 derniers produits achetés</h3>
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Produit</th>
-                    <th>Catégorie</th>
-                    <th>Marque</th>
-                    <th>Qté</th>
-                    <th>Prix TTC</th>
-                  </tr>
-                </thead>
-                <tbody id="purchases"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
+        <div id="suggest" class="suggest"></div>
       </div>
+    </header>
 
-      <div class="footer">Source: Imagino UCD API — Exposition_RCU/V1 / RCU_Fnac_2</div>
-      <div id="toast" class="toast hidden"></div>
+    <main class="layout">
+      <!-- FICHE CLIENT -->
+      <section id="cardDetails" class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px">
+          <h3>Fiche client</h3>
+          <div class="row">
+            <button id="editToggle" class="btn btn-secondary" title="Éditer">Éditer</button>
+            <button id="saveBtn" class="btn" style="display:none">Enregistrer</button>
+          </div>
+        </div>
+        <div class="kv">
+          <label>Prénom</label>
+          <input id="firstName" readonly />
+          <label>Nom</label>
+          <input id="lastName" readonly />
+          <label>Email</label>
+          <input id="email" readonly />
+          <label>Date de naissance</label>
+          <input id="dob" readonly />
+          <label>Opt-in Email</label>
+          <select id="optinEmail" disabled>
+            <option value="true">Oui</option>
+            <option value="false">Non</option>
+          </select>
+          <label>Opt-in SMS</label>
+          <select id="optinSMS" disabled>
+            <option value="true">Oui</option>
+            <option value="false">Non</option>
+          </select>
+          <label>Opt-in Push</label>
+          <select id="optinPush" disabled>
+            <option value="true">Oui</option>
+            <option value="false">Non</option>
+          </select>
+          <label>Ville</label>
+          <input id="city" readonly />
+          <label>Code postal</label>
+          <input id="zip" readonly />
+          <label>Statut fidélité</label>
+          <input id="statutFid" readonly />
+          <label>Statut RFM</label>
+          <input id="statutRFM" readonly />
+          <label>Magasin favori</label>
+          <input id="magasinFav" readonly />
+        </div>
+      </section>
+
+      <!-- DERNIERS ACHATS -->
+      <section id="cardPurchases" class="card">
+        <h3>3 derniers produits achetés</h3>
+        <table class="table" id="purchasesTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Produit</th>
+              <th>Marque</th>
+              <th>Catégorie</th>
+              <th>Qté</th>
+              <th>Total TTC</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div id="emptyPurchases" class="empty" style="display:none">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6l-2 0"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+          <div>Aucun achat récent</div>
+        </div>
+      </section>
+
+      <!-- ÉTAT VIDE (affiché tant qu'aucune recherche n'est faite) -->
+      <section id="emptyState" class="card show" style="grid-column:1 / -1; text-align:center; display:block">
+        <div class="empty">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <div>Commencez par saisir un email, un prénom ou un nom dans la barre de recherche.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODALE NOUVEAU CONTACT -->
+  <div id="modal" class="modal">
+    <div class="modal-backdrop"></div>
+    <div class="sheet">
+      <h3>Nouveau contact</h3>
+      <div class="grid">
+        <div><label>Prénom</label><input id="n_firstName" /></div>
+        <div><label>Nom</label><input id="n_lastName" /></div>
+        <div class="full"><label>Email</label><input id="n_email" /></div>
+        <div><label>Mobile</label><input id="n_mobile" /></div>
+        <div><label>Ville</label><input id="n_city" /></div>
+        <div><label>Code postal</label><input id="n_zip" /></div>
+        <div><label>Opt-in Email</label>
+          <select id="n_optinEmail"><option value="true">Oui</option><option value="false">Non</option></select>
+        </div>
+        <div><label>Opt-in SMS</label>
+          <select id="n_optinSMS"><option value="false">Non</option><option value="true">Oui</option></select>
+        </div>
+        <div class="full row" style="justify-content:flex-end; margin-top:8px">
+          <button id="cancelNew" class="btn btn-secondary">Annuler</button>
+          <button id="createNew" class="btn">Créer</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <script>
-    // === CONFIG ===
-    const API_BASE = 'https://fnacdarty-demo.poc2.imagino.com/ucdapi/Exposition_RCU/V1';
-    const API_KEY  = 'c92ad264-f863-4f56-8e9e-22da8f8450a1';
+<script>
+// ======= CONFIG (Swagger: Exposition RCU / RCU_Fnac_2) =======
+const BASE_URL = 'https://fnacdarty-demo.poc2.imagino.com/ucdapi/Exposition_RCU/V1';
+const ENDPOINT  = BASE_URL + '/RCU_Fnac_2';
+const API_KEY   = 'c92ad264-f863-4f56-8e9e-22da8f8450a1'; // fourni par François
 
-    document.getElementById('who').textContent = 'Conseiller·ère : Linda (Fnac Darty)';
+// ======= STATE =======
+let cache = [];         // mémoire locale des enregistrements (GET /RCU_Fnac_2)
+let selected = null;    // enregistrement sélectionné
 
-    const $ = (id) => document.getElementById(id);
-    const setRO = (on) => {
-      ['firstName','lastName','email','mobile','favStore','fid','rfm','optEmail','optSMS','optPush']
-        .forEach(id=>{ const el=$(id); el.readOnly=on; el.style.background= on? '#f9fafb':'#fff'; });
+// ======= HELPERS =======
+const $ = sel => document.querySelector(sel);
+const show = (el, on=true) => el.classList.toggle('show', on);
+const enableEdit = (on)=>{
+  ['firstName','lastName','email','dob','city','zip','statutFid','statutRFM','magasinFav'].forEach(id=>{
+    const input = document.getElementById(id);
+    input.readOnly = !on;
+  });
+  ['optinEmail','optinSMS','optinPush'].forEach(id=>{
+    const s = document.getElementById(id); s.disabled = !on;
+  });
+  $('#saveBtn').style.display = on ? 'inline-flex' : 'none';
+  $('#editToggle').textContent = on ? 'Annuler' : 'Éditer';
+}
+const norm = s => (s||'').toString().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'');
+
+// ======= API =======
+async function apiGET(url){
+  const res = await fetch(url, { headers:{ 'X-API-KEY': API_KEY }});
+  if(!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+async function apiPOST(url, payload){
+  const res = await fetch(url, { method:'POST', headers:{ 'Content-Type':'application/json', 'X-API-KEY': API_KEY }, body: JSON.stringify(payload)});
+  if(!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+async function ensureCache(){
+  if(cache.length) return cache;
+  const data = await apiGET(ENDPOINT + '?limit=1000');
+  cache = (data && data.data) ? data.data : [];
+  return cache;
+}
+
+// ======= SEARCH (client side filter on cached list) =======
+const q = $('#q');
+const suggest = $('#suggest');
+q.addEventListener('input', async (e)=>{
+  const term = norm(e.target.value);
+  if(!term){ suggest.style.display='none'; return; }
+  await ensureCache();
+  const list = cache.filter(r=>{
+    return norm(r.email).includes(term) || norm(r.firstName).includes(term) || norm(r.lastName).includes(term);
+  }).slice(0,20);
+  renderSuggestions(list);
+});
+
+function renderSuggestions(list){
+  suggest.innerHTML = '';
+  if(!list.length){ suggest.style.display='none'; return; }
+  list.forEach(r=>{
+    const div = document.createElement('div');
+    div.className = 's-item';
+    div.innerHTML = `
+      <span class="badge">RCU</span>
+      <div style="flex:1">
+        <div><strong>${r.firstName||''} ${r.lastName||''}</strong> · <span class="muted">${r.email||''}</span></div>
+        <div class="muted">${r.city||''} ${r.zipCode?('· '+r.zipCode):''}</div>
+      </div>`;
+    div.addEventListener('click', ()=> selectRecord(r));
+    suggest.appendChild(div);
+  });
+  suggest.style.display='block';
+}
+
+// ======= SELECT & RENDER =======
+function selectRecord(r){
+  selected = r; suggest.style.display='none';
+  $('#emptyState').style.display='none';
+  show($('#cardDetails'), true);
+  show($('#cardPurchases'), true);
+
+  // Fiche
+  $('#firstName').value = r.firstName || '';
+  $('#lastName').value  = r.lastName  || '';
+  $('#email').value     = r.email     || '';
+  $('#dob').value       = r.dateOfBirth || '';
+  $('#city').value      = r.city || '';
+  $('#zip').value       = r.zipCode || '';
+  $('#statutFid').value = r.Statut_Fidelite || '';
+  $('#statutRFM').value = r.Statut_RFM || '';
+  $('#magasinFav').value= r.Magasin_favori || '';
+  $('#optinEmail').value= String(r.optInEmail===true);
+  $('#optinSMS').value  = String(r.optInSMS===true);
+  $('#optinPush').value = String(r.optInPush===true);
+  enableEdit(false);
+
+  // Achats
+  const tb = document.querySelector('#purchasesTable tbody');
+  tb.innerHTML='';
+  const arr = Array.isArray(r['3_derniers_produits_achetes']) ? r['3_derniers_produits_achetes'] : [];
+  if(!arr.length){
+    document.getElementById('emptyPurchases').style.display='flex';
+  } else {
+    document.getElementById('emptyPurchases').style.display='none';
+    arr.forEach(p=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${p.Order_date ? new Date(p.Order_date).toLocaleDateString() : ''}</td>
+        <td>${p.product_name || ''}</td>
+        <td><span class="pill">${p.brand||''}</span></td>
+        <td>${p.category||''}</td>
+        <td>${p.quantity??''}</td>
+        <td>${typeof p.line_total_ttc==='number' ? (p.line_total_ttc.toFixed(2)+' €') : ''}</td>`;
+      tb.appendChild(tr);
+    });
+  }
+}
+
+// ======= EDIT / SAVE =======
+$('#editToggle').addEventListener('click', ()=>{
+  const editing = $('#saveBtn').style.display !== 'none';
+  enableEdit(!editing);
+});
+
+$('#saveBtn').addEventListener('click', async ()=>{
+  if(!selected) return;
+  try{
+    const payload = {
+      // Respecte le schéma write (RCU_Fnac_2-write) — ne pas envoyer Statut_Fidelite ni Magasin_favori
+      email:       $('#email').value,
+      firstName:   $('#firstName').value,
+      lastName:    $('#lastName').value,
+      dateOfBirth: $('#dob').value || null,
+      city:        $('#city').value || null,
+      zipCode:     $('#zip').value || null,
+      // mapping lecture->écriture : Statut_RFM (read) -> RFM (write)
+      RFM:         $('#statutRFM').value || null,
+      // opt-ins autorisés en write
+      optInEmail:  $('#optinEmail').value === 'true',
+      optInSMS:    $('#optinSMS').value === 'true',
+      optInPush:   $('#optinPush').value === 'true'
     };
-    const showAppBody = (on)=>{
-      $('#leftBody').classList.toggle('hidden', !on);
-      $('#rightPanel').classList.toggle('hidden', !on);
-    };
+    await apiPOST(ENDPOINT, payload);
+    // update local cache copy
+    Object.assign(selected, payload);
+    enableEdit(false);
+    alert('Profil mis à jour.');
+  }catch(e){
+    console.error(e); alert('Échec de la mise à jour: '+e.message);
+  }
+});
 
-    // Toast helper
-    const toast = (msg, ms=3500)=>{
-      const t=$('#toast'); t.innerHTML=msg; t.classList.remove('hidden');
-      clearTimeout(t._h); t._h=setTimeout(()=>t.classList.add('hidden'), ms);
-    };
+// ======= NEW CONTACT =======
+const modal = document.getElementById('modal');
+const openModal = (on)=>{ modal.classList.toggle('show', !!on); }
 
-    // Debounce helper
-    const debounce=(fn,ms)=>{let h;return(...args)=>{clearTimeout(h);h=setTimeout(()=>fn(...args),ms)}};
+document.getElementById('newBtn').addEventListener('click', ()=> openModal(true));
+document.querySelector('.modal-backdrop').addEventListener('click', ()=> openModal(false));
+document.getElementById('cancelNew').addEventListener('click', ()=> openModal(false));
 
-    // Search-as-you-type with graceful fallbacks
-    const doSearch = async (q)=>{
-      const sug = $('#sug');
-      sug.innerHTML='';
-      if(q.length<3){
-        const div=document.createElement('div'); div.className='sug-empty';
-        div.textContent='Tape au moins 3 caractères'; sug.appendChild(div);
-        showAppBody(false);
-        return;
-      }
-
-      // show spinner row
-      const spin=document.createElement('div'); spin.className='sug-empty';
-      spin.innerHTML='<span class="spinner"></span>Recherche…';
-      sug.appendChild(spin);
-
-      try{
-        let hits=[];
-        // 1) Try a hypothetical server-side search endpoint (if available on your UCD)
-        let res = await fetch(`${API_BASE}/RCU_Fnac_2/search?email=${encodeURIComponent(q)}&limit=50`,{
-          headers:{'X-API-KEY': API_KEY,'x-api-key':API_KEY,'Authorization':`Bearer ${API_KEY}`}
-        });
-        if(res.ok){
-          const js = await res.json();
-          hits = (js && (js.data||js.results||[])) || [];
-        } else if(res.status===404){
-          // 2) Fallback to list + client-side filter
-          res = await fetch(`${API_BASE}/RCU_Fnac_2?limit=10000`,{headers:{'X-API-KEY': API_KEY,'x-api-key':API_KEY}});
-          const js = await res.json();
-          const arr = (js && js.data) ? js.data : [];
-          hits = arr.filter(x=> (x.email||'').toLowerCase().includes(q)).slice(0,50);
-        } else {
-          throw new Error(`HTTP ${res.status}`);
-        }
-
-        sug.innerHTML='';
-        if(!hits.length){
-          const div=document.createElement('div'); div.className='sug-empty';
-          div.textContent='Aucun résultat'; sug.appendChild(div);
-          showAppBody(false); return;
-        }
-        hits.forEach(x=>{
-          const div = document.createElement('div');
-          div.textContent = `${x.firstName||''} ${x.lastName||''} — ${x.email||''}`;
-          div.addEventListener('click', ()=>{
-            sug.innerHTML='';
-            loadRecord(x);
-            $('#q').value = x.email||'';
-            showAppBody(true);
-          });
-          sug.appendChild(div);
-        });
-      }catch(err){
-        console.error(err);
-        sug.innerHTML='';
-        const div=document.createElement('div'); div.className='sug-empty';
-        div.textContent='Erreur de recherche'; sug.appendChild(div);
-        toast("Impossible de joindre l'API (CORS / réseau). Ouvre le fichier via un serveur local ou autorise le domaine dans CORS.");
-        showAppBody(false);
-      }
-    };
-
-    $('#q').addEventListener('input', debounce((e)=>{
-      const q = e.target.value.trim().toLowerCase();
-      if(!q){ showAppBody(false); $('#sug').innerHTML=''; return; }
-      doSearch(q);
-    }, 250));
-
-    // Populate UI
-    function loadRecord(rec){
-      $('#firstName').value = rec.firstName||'';
-      $('#lastName').value  = rec.lastName||'';
-      $('#email').value     = rec.email||'';
-      $('#mobile').value    = rec.mobile||'';
-      $('#favStore').value  = rec.Magasin_favori||'';
-      $('#fid').value       = rec.Statut_Fidelite||'';
-      $('#rfm').value       = rec.Statut_RFM||rec.RFM||'';
-      $('#optEmail').value  = rec.optInEmail===true? 'Oui':'Non';
-      $('#optSMS').value    = rec.optInSMS===true? 'Oui':'Non';
-      $('#optPush').value   = rec.optInPush===true? 'Oui':'Non';
-
-      $('#ca').textContent       = fmtEUR(rec.CA_Omnicanal_en);
-      $('#classif').textContent  = rec.Classification_client||'';
-      $('#city').textContent     = rec.city||'';
-      $('#zip').textContent      = rec.zipCode||'';
-      $('#dob').textContent      = rec.dateOfBirth||'';
-      $('#storeId').textContent  = rec.Store_ID||'';
-
-      const tbody = $('#purchases');
-      tbody.innerHTML='';
-      const items = Array.isArray(rec['3_derniers_produits_achetes'])?rec['3_derniers_produits_achetes']:[];
-      items.forEach(it=>{
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${safe(it.Order_date)}</td>
-          <td>${safe(it.product_name)}<div class="pill">SKU ${safe(it.sku)}</div></td>
-          <td>${safe(it.category)}</td>
-          <td>${safe(it.brand)}</td>
-          <td>${safe(it.quantity)}</td>
-          <td>${fmtEUR(it.line_total_ttc || it.unit_price_ttc)}</td>`;
-        tbody.appendChild(tr);
-      });
-
-      setRO(true);
-      $('#btnEdit').style.display='inline-block';
-      $('#btnSave').style.display='none';
-      $('#btnCancel').style.display='none';
-    }
-
-    function fmtEUR(v){
-      if(v===undefined||v===null||v==='') return '—';
-      const n = Number(v);
-      if(Number.isNaN(n)) return String(v);
-      return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n);
-    }
-    function safe(v){ return (v===undefined||v===null)?'':String(v); }
-
-    // Edit/Save profile (upsert via POST /RCU_Fnac_2)
-    $('#btnEdit').addEventListener('click', ()=>{
-      setRO(false);
-      $('#btnEdit').style.display='none';
-      $('#btnSave').style.display='inline-block';
-      $('#btnCancel').style.display='inline-block';
-    });
-    $('#btnCancel').addEventListener('click', ()=>{
-      setRO(true);
-      $('#btnEdit').style.display='inline-block';
-      $('#btnSave').style.display='none';
-      $('#btnCancel').style.display='none';
-    });
-    $('#btnSave').addEventListener('click', async ()=>{
-      const payload = {
-        firstName: $('#firstName').value.trim(),
-        lastName:  $('#lastName').value.trim(),
-        email:     $('#email').value.trim(),
-        mobile:    $('#mobile').value.trim(),
-        Store_ID:  $('#storeId').textContent.trim(),
-        city:      $('#city').textContent.trim(),
-        zipCode:   $('#zip').textContent.trim(),
-        optInEmail: $('#optEmail').value.toLowerCase()==='oui',
-        optInSMS:   $('#optSMS').value.toLowerCase()==='oui',
-        optInPush:  $('#optPush').value.toLowerCase()==='oui'
-      };
-      try{
-        const res = await fetch(`${API_BASE}/RCU_Fnac_2`,{
-          method:'POST',
-          headers:{'Content-Type':'application/json','X-API-KEY':API_KEY,'x-api-key':API_KEY,'Authorization':`Bearer ${API_KEY}`},
-          body: JSON.stringify(payload)
-        });
-        if(!res.ok){
-          const t = await res.text();
-          alert('Échec de la sauvegarde: '+t);
-          return;
-        }
-        toast('Profil enregistré.');
-        setRO(true);
-        $('#btnEdit').style.display='inline-block';
-        $('#btnSave').style.display='none';
-        $('#btnCancel').style.display='none';
-      }catch(e){ console.error(e); toast('Erreur réseau.'); }
-    });
-
-    // New contact bubble logic
-    const bubble = $('#createBubble');
-    const openBubble = ()=>{ bubble.classList.remove('hidden'); $('#cFirst').focus(); };
-    const closeBubble = ()=>{ bubble.classList.add('hidden'); };
-
-    $('#btnNew').addEventListener('click', ()=>{
-      // Reset fields each open
-      ['cFirst','cLast','cEmail','cMobile'].forEach(id=>$('#'+id).value='');
-      openBubble();
-    });
-    $('#bubbleClose').addEventListener('click', closeBubble);
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeBubble(); });
-    document.addEventListener('click', (e)=>{ if(!bubble.classList.contains('hidden') && !bubble.contains(e.target) && e.target.id!=='btnNew'){ closeBubble(); }});
-
-    // Create from bubble
-    $('#bubbleCreate').addEventListener('click', async ()=>{
-      const payload = {
-        firstName: $('#cFirst').value.trim(),
-        lastName:  $('#cLast').value.trim(),
-        email:     $('#cEmail').value.trim(),
-        mobile:    $('#cMobile').value.trim(),
-        createdDate: new Date().toISOString()
-      };
-      if(!payload.email){ toast('Email requis.'); return; }
-      try{
-        const res = await fetch(`${API_BASE}/RCU_Fnac_2`,{
-          method:'POST',
-          headers:{'Content-Type':'application/json','X-API-KEY':API_KEY,'x-api-key':API_KEY,'Authorization':`Bearer ${API_KEY}`},
-          body: JSON.stringify(payload)
-        });
-        if(!res.ok){
-          const t = await res.text();
-          toast('Création impossible: '+t);
-          return;
-        }
-        toast('Contact créé.');
-        closeBubble();
-        $('#q').value = payload.email;
-        doSearch(payload.email.toLowerCase());
-      }catch(e){ console.error(e); toast('Erreur réseau.'); }
-    });
-  </script>
+$('#createNew').addEventListener('click', async ()=>{
+  const payload = {
+    email: $('#n_email').value,
+    firstName: $('#n_firstName').value,
+    lastName:  $('#n_lastName').value,
+    mobile:    $('#n_mobile').value || null,
+    city:      $('#n_city').value || null,
+    zipCode:   $('#n_zip').value || null,
+    optInEmail: $('#n_optinEmail').value === 'true',
+    optInSMS:   $('#n_optinSMS').value === 'true'
+  };
+  if(!payload.email){ alert('Email requis.'); return; }
+  try{
+    await apiPOST(ENDPOINT, payload);
+    cache.unshift(payload); // naïf: on ajoute en tête pour la session
+    openModal(false);
+    q.value = payload.email; // préremplir la recherche
+    renderSuggestions([payload]);
+    alert('Contact créé.');
+  }catch(e){ console.error(e); alert('Échec création: '+e.message); }
+});
+</script>
 </body>
 </html>
