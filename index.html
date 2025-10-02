@@ -262,7 +262,8 @@ async function ensureCache(){
 // ======= SEARCH (client side filter on cached list) =======
 q.addEventListener('input', async (e)=>{
   const term = norm(e.target.value);
-  if(!term){ closeSuggestions(); return; }
+  // Exige au moins 2 caractères, sinon on ferme
+  if(!term || term.length < 2){ closeSuggestions(); return; }
   await ensureCache();
   const list = cache.filter(r=>{
     return norm(r.email).includes(term) || norm(r.firstName).includes(term) || norm(r.lastName).includes(term);
@@ -271,11 +272,23 @@ q.addEventListener('input', async (e)=>{
 });
 
 function renderSuggestions(list){
-  // Si un profil est déjà sélectionné, ne rien afficher
-  if(selected){
-    closeSuggestions();
-    return;
-  }
+  suggest.innerHTML = '';
+  if(!list.length){ closeSuggestions(); return; }
+  list.forEach(r=>{
+    const div = document.createElement('div');
+    div.className = 's-item';
+    div.innerHTML = `
+      <span class="badge">RCU</span>
+      <div style=\"flex:1\">
+        <div><strong>${r.firstName||''} ${r.lastName||''}</strong> · <span class=\"muted\">${r.email||''}</span></div>
+        <div class=\"muted\">${r.city||''} ${r.zipCode?('· '+r.zipCode):''}</div>
+      </div>`;
+    div.addEventListener('click', ()=> selectRecord(r));
+    suggest.appendChild(div);
+  });
+  suggest.style.display='block';
+  q.setAttribute('aria-expanded','true');
+}
   suggest.innerHTML = '';
   if(!list.length){ closeSuggestions(); return; }
   list.forEach(r=>{
