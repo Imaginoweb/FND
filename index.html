@@ -292,6 +292,9 @@ function renderSuggestions(list){
 // ======= SELECT & RENDER =======
 function selectRecord(r){
   selected = r; closeSuggestions();
+  // Masquer totalement la recherche/suggestions une fois un profil choisi
+  q.value = '';
+  q.blur();
   $('#emptyState').style.display='none';
   show($('#cardDetails'), true);
   show($('#cardPurchases'), true);
