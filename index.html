@@ -245,6 +245,23 @@ async function ensureCache(){
 // ======= SEARCH (client side filter on cached list) =======
 const q = $('#q');
 const suggest = $('#suggest');
+  const searchwrap = document.querySelector('.searchwrap');
+function closeSuggestions() {
+  suggest.innerHTML = '';
+  suggest.style.display = 'none';
+  q.setAttribute('aria-expanded','false');
+}
+
+// Fermer si clique hors zone
+document.addEventListener('click', (e) => {
+  if (!searchwrap.contains(e.target)) closeSuggestions();
+});
+
+// Fermer avec Echap
+q.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { closeSuggestions(); q.blur(); }
+});
+
 q.addEventListener('input', async (e)=>{
   const term = norm(e.target.value);
   if(!term){ suggest.style.display='none'; return; }
@@ -270,12 +287,13 @@ function renderSuggestions(list){
     div.addEventListener('click', ()=> selectRecord(r));
     suggest.appendChild(div);
   });
-  suggest.style.display='block';
+  suggest.style.display = 'block';
+  q.setAttribute('aria-expanded','true');
 }
 
 // ======= SELECT & RENDER =======
 function selectRecord(r){
-  selected = r; suggest.style.display='none';
+  selected = r; closeSuggestions();
   $('#emptyState').style.display='none';
   show($('#cardDetails'), true);
   show($('#cardPurchases'), true);
