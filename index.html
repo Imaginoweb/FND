@@ -327,16 +327,16 @@ $('#saveBtn').addEventListener('click', async ()=>{
   if(!selected) return;
   try{
     const payload = {
-      // write schema (RCU_Fnac_2-write)
+      // Respecte le schéma write (RCU_Fnac_2-write) — ne pas envoyer Statut_Fidelite ni Magasin_favori
       email:       $('#email').value,
       firstName:   $('#firstName').value,
       lastName:    $('#lastName').value,
       dateOfBirth: $('#dob').value || null,
       city:        $('#city').value || null,
       zipCode:     $('#zip').value || null,
-      Statut_Fidelite: $('#statutFid').value || null,
+      // mapping lecture->écriture : Statut_RFM (read) -> RFM (write)
       RFM:         $('#statutRFM').value || null,
-      Magasin_favori: $('#magasinFav').value || null,
+      // opt-ins autorisés en write
       optInEmail:  $('#optinEmail').value === 'true',
       optInSMS:    $('#optinSMS').value === 'true',
       optInPush:   $('#optinPush').value === 'true'
