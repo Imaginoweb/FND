@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+v<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
@@ -291,7 +291,11 @@ function renderSuggestions(list){
 
 // ======= SELECT & RENDER =======
 function selectRecord(r){
-  selected = r; closeSuggestions();
+  selected = r;
+  closeSuggestions();
+  q.value = '';
+  q.setAttribute('aria-expanded','false');
+  suggest.style.display = 'none';
   // Masquer totalement la recherche/suggestions une fois un profil choisi
   q.value = '';
   q.blur();
