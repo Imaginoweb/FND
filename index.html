@@ -6,81 +6,132 @@
   <title>Fnac Darty – Clienteling</title>
   <link rel="icon" href="https://static.publicocdn.com/files/site/assets/img/commercial/fnac-logo.png" />
   <style>
-    :root{
-      --brand:#000;          /* noir Fnac */
-      --accent:#ffd200;      /* jaune Fnac */
-      --bg:#f6f6f6;
-      --ink:#111;
-      --muted:#6b7280;
-      --card:#fff;
-      --radius:18px;
-      --shadow:0 8px 24px rgba(0,0,0,.08);
+    :root {
+      --brand: #000;          /* noir Fnac */
+      --accent: #ffd200;      /* jaune Fnac */
+      --bg: #f6f6f6;
+      --ink: #111;
+      --muted: #6b7280;
+      --card: #fff;
+      --radius: 18px;
+      --shadow: 0 8px 24px rgba(0,0,0,.08);
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
-      background:var(--bg); color:var(--ink);
-      display:flex; align-items:center; justify-content:center;
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; background: var(--bg); color: var(--ink); }
+    body { display: flex; align-items: center; justify-content: center; }
+    .app {
+      width: min(1280px, 96vw);
+      height: min(820px, 92vh);
+      background: linear-gradient(160deg, #fff, #fff 60%, #fff2);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: 84px 1fr;
+      border: 1px solid #e5e7eb;
     }
-    .app{
-      width:min(1280px, 96vw); height:min(820px, 92vh);
-      background:linear-gradient(160deg, #fff, #fff 60%, #fff2);
-      border-radius:28px; box-shadow:var(--shadow);
-      overflow:hidden; display:grid; grid-template-rows:84px 1fr;
-      border:1px solid #e5e7eb;
+    .topbar {
+      display: flex; align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: #fff;
+      border-bottom: 1px solid #eee;
     }
-    .topbar{
-      display:flex; align-items:center; gap:16px; padding:16px 20px; background:#fff; border-bottom:1px solid #eee;
+    .logo { height: 44px; }
+    .searchwrap { margin-left: auto; display: flex; align-items: center; gap: 10px; position: relative; }
+    .search {
+      width: 520px; max-width: 64vw;
+      height: 44px;
+      border: 1.5px solid #ddd;
+      border-radius: 999px;
+      padding: 0 16px 0 48px;
+      outline: none;
+      font-size: 16px;
+      background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>') no-repeat 14px center;
+      transition: border-color .2s, box-shadow .2s;
     }
-    .logo{height:44px}
-    .searchwrap{margin-left:auto; display:flex; align-items:center; gap:10px; position:relative}
-    .search{
-      width:520px; max-width:64vw; height:44px; border:1.5px solid #ddd; border-radius:999px; padding:0 16px 0 48px; outline:none; font-size:16px; background:#fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>') no-repeat 14px center;
-      transition:border-color .2s, box-shadow .2s
+    .search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,210,0,.25); }
+    .btn { height: 44px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--brand); background: var(--brand); color: #fff; font-weight: 600; cursor: pointer; }
+    .btn:hover { opacity: .9; }
+    .btn-secondary { background: #fff; color: var(--brand); }
+    .suggest {
+      position: absolute;
+      top: 70px; right: 0;
+      width: min(640px, 92vw);
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: none;
+      z-index: 1000;
     }
-    .search:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(255,210,0,.25)}
-    .btn{height:44px; padding:0 14px; border-radius:999px; border:1.5px solid var(--brand); background:var(--brand); color:#fff; font-weight:600; cursor:pointer}
-    .btn:hover{opacity:.9}
-    .btn-secondary{background:#fff; color:var(--brand)}
+    .s-item { padding: 12px 14px; display: flex; gap: 12px; align-items: center; cursor: pointer; }
+    .s-item:hover { background: #fafafa; }
+    .badge { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--accent); color: #111; font-weight: 700; }
+    .muted { color: var(--muted); }
+    mark { background-color: var(--accent); color: #000; padding: 0 2px; border-radius: 3px; }
 
-    /* Suggestions */
-    .suggest{position:absolute; top:70px; right:0; width:min(640px, 92vw); background:#fff; border:1px solid #eee; border-radius:16px; box-shadow:var(--shadow); overflow:hidden; display:none; z-index:1000}
-    .s-item{padding:12px 14px; display:flex; gap:12px; align-items:center; cursor:pointer}
-    .s-item:hover{background:#fafafa}
-    .badge{font-size:12px; padding:2px 8px; border-radius:999px; background:var(--accent); color:#111; font-weight:700}
-    .muted{color:var(--muted)}
+    .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; padding: 18px; height: 100%; }
+    .card { background: var(--card); border: 1px solid #eee; border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); display: none; }
+    .card.show { display: block; }
+    .card h3 { margin: 0 0 12px; font-size: 18px; }
+    .kv { display: grid; grid-template-columns: 180px 1fr; gap: 10px; align-items: center; }
+    .kv input, .kv select { height: 38px; padding: 0 10px; border: 1px solid #e5e7eb; border-radius: 10px; outline: none; }
+    .kv input[readonly] { background: #fafafa; }
+    .kv select:disabled { background: #fafafa; }
+    .row { display: flex; gap: 10px; }
+    .row .btn { height: 36px; }
+    .table { width: 100%; border-collapse: collapse; }
+    .table th, .table td { padding: 10px 8px; border-bottom: 1px solid #eee; text-align: left; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #f3f4f6; }
 
-    .layout{display:grid; grid-template-columns:1fr 1fr; gap:18px; padding:18px; height:100%;}
-    .card{background:var(--card); border:1px solid #eee; border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); display:none}
-    .card.show{display:block}
-    .card h3{margin:0 0 12px; font-size:18px}
-    .kv{display:grid; grid-template-columns:180px 1fr; gap:10px; align-items:center}
-    .kv input, .kv select{height:38px; padding:0 10px; border:1px solid #e5e7eb; border-radius:10px; outline:none}
-    .kv input[readonly]{background:#fafafa}
-    .row{display:flex; gap:10px}
-    .row .btn{height:36px}
+    .empty { height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: var(--muted); }
+    .empty svg { width: 72px; height: 72px; }
 
-    .table{width:100%; border-collapse:collapse}
-    .table th,.table td{padding:10px 8px; border-bottom:1px solid #eee; text-align:left}
-    .pill{display:inline-block; padding:2px 8px; border-radius:999px; background:#f3f4f6}
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: none; }
+    .modal { position: fixed; inset: 0; display: grid; place-items: center; pointer-events: none; }
+    .sheet {
+      width: min(560px, 92vw);
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: .2s;
+    }
+    .modal.show { pointer-events: auto; }
+    .modal.show .modal-backdrop { display: block; }
+    .modal.show .sheet { transform: none; opacity: 1; }
+    .sheet h3 { margin: 0 0 12px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .grid .full { grid-column: 1 / -1; }
 
-    .empty{height:100%; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; color:var(--muted)}
-    .empty svg{width:72px; height:72px}
-
-    /* Modal */
-    .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none}
-    .modal{position:fixed; inset:0; display:grid; place-items:center; pointer-events:none}
-    .sheet{width:min(560px, 92vw); background:#fff; border-radius:20px; box-shadow:var(--shadow); padding:18px; transform:translateY(20px); opacity:0; transition:.2s}
-    .modal.show{pointer-events:auto}
-    .modal.show .modal-backdrop{display:block}
-    .modal.show .sheet{transform:none; opacity:1}
-    .sheet h3{margin:0 0 12px}
-    .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-    .grid .full{grid-column:1 / -1}
+    /* Loader overlay */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255, .7);
+      display: none;
+      z-index: 9999;
+      place-items: center;
+    }
+    .spinner {
+      border: 4px solid #ddd;
+      border-top: 4px solid var(--accent);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
+  <div id="loader"><div class="spinner"></div></div>
   <div class="app">
     <header class="topbar">
       <img class="logo" src="https://static.publicocdn.com/files/site/assets/img/commercial/fnac-logo.png" alt="Fnac Darty" />
@@ -102,14 +153,10 @@
           </div>
         </div>
         <div class="kv">
-          <label>Prénom</label>
-          <input id="firstName" readonly />
-          <label>Nom</label>
-          <input id="lastName" readonly />
-          <label>Email</label>
-          <input id="email" readonly />
-          <label>Date de naissance</label>
-          <input id="dob" readonly />
+          <label>Prénom</label><input id="firstName" readonly />
+          <label>Nom</label><input id="lastName" readonly />
+          <label>Email</label><input id="email" readonly />
+          <label>Date de naissance</label><input id="dob" readonly />
           <label>Opt-in Email</label>
           <select id="optinEmail" disabled>
             <option value="true">Oui</option>
@@ -125,16 +172,11 @@
             <option value="true">Oui</option>
             <option value="false">Non</option>
           </select>
-          <label>Ville</label>
-          <input id="city" readonly />
-          <label>Code postal</label>
-          <input id="zip" readonly />
-          <label>Statut fidélité</label>
-          <input id="statutFid" readonly />
-          <label>Statut RFM</label>
-          <input id="statutRFM" readonly />
-          <label>Magasin favori</label>
-          <input id="magasinFav" readonly />
+          <label>Ville</label><input id="city" readonly />
+          <label>Code postal</label><input id="zip" readonly />
+          <label>Statut fidélité</label><input id="statutFid" readonly />
+          <label>Statut RFM</label><input id="statutRFM" readonly />
+          <label>Magasin favori</label><input id="magasinFav" readonly />
         </div>
       </section>
 
@@ -155,7 +197,12 @@
           <tbody></tbody>
         </table>
         <div id="emptyPurchases" class="empty" style="display:none">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6l-2 0"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M6 6h15l-1.5 9h-12z"/>
+            <path d="M6 6l-2 0"/>
+            <circle cx="9" cy="20" r="1"/>
+            <circle cx="18" cy="20" r="1"/>
+          </svg>
           <div>Aucun achat récent</div>
         </div>
       </section>
@@ -163,7 +210,10 @@
       <!-- ÉTAT VIDE (affiché tant qu'aucune recherche n'est faite) -->
       <section id="emptyState" class="card show" style="grid-column:1 / -1; text-align:center; display:block">
         <div class="empty">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.3-4.3"/>
+          </svg>
           <div>Commencez par saisir un email, un prénom ou un nom dans la barre de recherche.</div>
         </div>
       </section>
@@ -188,7 +238,7 @@
         <div><label>Opt-in SMS</label>
           <select id="n_optinSMS"><option value="false">Non</option><option value="true">Oui</option></select>
         </div>
-        <div class="full row" style="justify-content:flex-end; margin-top:8px">
+        <div class="full row" style="justify-content: flex-end; margin-top:8px">
           <button id="cancelNew" class="btn btn-secondary">Annuler</button>
           <button id="createNew" class="btn">Créer</button>
         </div>
@@ -196,246 +246,291 @@
     </div>
   </div>
 
-<script>
-// ======= CONFIG (Swagger: Exposition RCU / RCU_Fnac_2) =======
-const BASE_URL = 'https://fnacdarty-demo.poc2.imagino.com/ucdapi/Exposition_RCU/V1';
-const ENDPOINT  = BASE_URL + '/RCU_Fnac_2';
-const API_KEY   = 'c92ad264-f863-4f56-8e9e-22da8f8450a1'; // fourni par François
+  <script>
+    // ======= CONFIG (Swagger: Exposition RCU / RCU_Fnac_2) =======
+    const BASE_URL = 'https://fnacdarty-demo.poc2.imagino.com/ucdapi/Exposition_RCU/V1';
+    const ENDPOINT = BASE_URL + '/RCU_Fnac_2';
+    const API_KEY = 'c92ad264-f863-4f56-8e9e-22da8f8450a1';
 
-// ======= STATE =======
-let cache = [];         // mémoire locale des enregistrements (GET /RCU_Fnac_2)
-let selected = null;    // enregistrement sélectionné
+    // ======= STATE =======
+    let cache = [];
+    let selected = null;
 
-// ======= HELPERS =======
-const $ = sel => document.querySelector(sel);
-const show = (el, on=true) => el.classList.toggle('show', on);
-const enableEdit = (on)=>{
-  ['firstName','lastName','email','dob','city','zip','statutFid','statutRFM','magasinFav'].forEach(id=>{
-    const input = document.getElementById(id);
-    input.readOnly = !on;
-  });
-  ['optinEmail','optinSMS','optinPush'].forEach(id=>{
-    const s = document.getElementById(id); s.disabled = !on;
-  });
-  $('#saveBtn').style.display = on ? 'inline-flex' : 'none';
-  $('#editToggle').textContent = on ? 'Annuler' : 'Éditer';
-}
-const norm = s => (s||'').toString().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'');
-
-// Gestion robuste de la dropdown
-const q = $('#q');
-const suggest = $('#suggest');
-const searchwrap = document.querySelector('.searchwrap');
-function closeSuggestions(){
-  suggest.innerHTML = '';
-  suggest.style.display = 'none';
-  q.setAttribute('aria-expanded','false');
-}
-document.addEventListener('click', (e)=>{ if(!searchwrap.contains(e.target)) closeSuggestions(); });
-q.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeSuggestions(); q.blur(); }});
-q.addEventListener('keydown', (e)=>{
-  if(e.key==='Enter' && suggest.style.display==='block'){
-    const first = suggest.querySelector('.s-item');
-    if(first) first.click();
-  }
-});
-
-// ======= API =======
-async function apiGET(url){
-  const res = await fetch(url, { headers:{ 'X-API-KEY': API_KEY }});
-  if(!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-async function apiPOST(url, payload){
-  const res = await fetch(url, { method:'POST', headers:{ 'Content-Type':'application/json', 'X-API-KEY': API_KEY }, body: JSON.stringify(payload)});
-  if(!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-
-async function ensureCache(){
-  if(cache.length) return cache;
-  const data = await apiGET(ENDPOINT + '?limit=1000');
-  cache = (data && data.data) ? data.data : [];
-  return cache;
-}
-
-// ======= SEARCH (client side filter on cached list) =======
-q.addEventListener('input', async (e)=>{
-  const term = norm(e.target.value);
-  // Exige au moins 2 caractères, sinon on ferme
-  if(!term || term.length < 2){ closeSuggestions(); return; }
-  await ensureCache();
-  const list = cache.filter(r=>{
-    return norm(r.email).includes(term) || norm(r.firstName).includes(term) || norm(r.lastName).includes(term);
-  }).slice(0,20);
-  renderSuggestions(list);
-});
-
-function renderSuggestions(list){
-  suggest.innerHTML = '';
-  if(!list.length){ closeSuggestions(); return; }
-  list.forEach(r=>{
-    const div = document.createElement('div');
-    div.className = 's-item';
-    div.innerHTML = `
-      <span class="badge">RCU</span>
-      <div style=\"flex:1\">
-        <div><strong>${r.firstName||''} ${r.lastName||''}</strong> · <span class=\"muted\">${r.email||''}</span></div>
-        <div class=\"muted\">${r.city||''} ${r.zipCode?('· '+r.zipCode):''}</div>
-      </div>`;
-    div.addEventListener('click', ()=> selectRecord(r));
-    suggest.appendChild(div);
-  });
-  suggest.style.display='block';
-  q.setAttribute('aria-expanded','true');
-}
-  suggest.innerHTML = '';
-  if(!list.length){ closeSuggestions(); return; }
-  list.forEach(r=>{
-    const div = document.createElement('div');
-    div.className = 's-item';
-    div.innerHTML = `
-      <span class="badge">RCU</span>
-      <div style="flex:1">
-        <div><strong>${r.firstName||''} ${r.lastName||''}</strong> · <span class="muted">${r.email||''}</span></div>
-        <div class="muted">${r.city||''} ${r.zipCode?('· '+r.zipCode):''}</div>
-      </div>`;
-    div.addEventListener('click', ()=> selectRecord(r));
-    suggest.appendChild(div);
-  });
-  suggest.style.display='block';
-  q.setAttribute('aria-expanded','true');
-}
-  list.forEach(r=>{
-    const div = document.createElement('div');
-    div.className = 's-item';
-    div.innerHTML = `
-      <span class="badge">RCU</span>
-      <div style="flex:1">
-        <div><strong>${r.firstName||''} ${r.lastName||''}</strong> · <span class="muted">${r.email||''}</span></div>
-        <div class="muted">${r.city||''} ${r.zipCode?('· '+r.zipCode):''}</div>
-      </div>`;
-    div.addEventListener('click', ()=> selectRecord(r));
-    suggest.appendChild(div);
-  });
-  suggest.style.display='block';
-  q.setAttribute('aria-expanded','true');
-}
-
-// ======= SELECT & RENDER =======
-function selectRecord(r){
-  selected = r;
-  closeSuggestions();
-  q.value = '';
-  q.setAttribute('aria-expanded','false');
-  suggest.style.display = 'none';
-  // Masquer totalement la recherche/suggestions une fois un profil choisi
-  q.value = '';
-  q.blur();
-  $('#emptyState').style.display='none';
-  show($('#cardDetails'), true);
-  show($('#cardPurchases'), true);
-
-  // Fiche
-  $('#firstName').value = r.firstName || '';
-  $('#lastName').value  = r.lastName  || '';
-  $('#email').value     = r.email     || '';
-  $('#dob').value       = r.dateOfBirth || '';
-  $('#city').value      = r.city || '';
-  $('#zip').value       = r.zipCode || '';
-  $('#statutFid').value = r.Statut_Fidelite || '';
-  $('#statutRFM').value = r.Statut_RFM || '';
-  $('#magasinFav').value= r.Magasin_favori || '';
-  $('#optinEmail').value= String(r.optInEmail===true);
-  $('#optinSMS').value  = String(r.optInSMS===true);
-  $('#optinPush').value = String(r.optInPush===true);
-  enableEdit(false);
-
-  // Achats
-  const tb = document.querySelector('#purchasesTable tbody');
-  tb.innerHTML='';
-  const arr = Array.isArray(r['3_derniers_produits_achetes']) ? r['3_derniers_produits_achetes'] : [];
-  if(!arr.length){
-    document.getElementById('emptyPurchases').style.display='flex';
-  } else {
-    document.getElementById('emptyPurchases').style.display='none';
-    arr.forEach(p=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${p.Order_date ? new Date(p.Order_date).toLocaleDateString() : ''}</td>
-        <td>${p.product_name || ''}</td>
-        <td><span class="pill">${p.brand||''}</span></td>
-        <td>${p.category||''}</td>
-        <td>${p.quantity??''}</td>
-        <td>${typeof p.line_total_ttc==='number' ? (p.line_total_ttc.toFixed(2)+' €') : ''}</td>`;
-      tb.appendChild(tr);
-    });
-  }
-}
-
-// ======= EDIT / SAVE =======
-$('#editToggle').addEventListener('click', ()=>{
-  const editing = $('#saveBtn').style.display !== 'none';
-  enableEdit(!editing);
-});
-
-$('#saveBtn').addEventListener('click', async ()=>{
-  if(!selected) return;
-  try{
-    const payload = {
-      // Respecte le schéma write (RCU_Fnac_2-write) — ne pas envoyer Statut_Fidelite ni Magasin_favori
-      email:       $('#email').value,
-      firstName:   $('#firstName').value,
-      lastName:    $('#lastName').value,
-      dateOfBirth: $('#dob').value || null,
-      city:        $('#city').value || null,
-      zipCode:     $('#zip').value || null,
-      // mapping lecture->écriture : Statut_RFM (read) -> RFM (write)
-      RFM:         $('#statutRFM').value || null,
-      // opt-ins autorisés en write
-      optInEmail:  $('#optinEmail').value === 'true',
-      optInSMS:    $('#optinSMS').value === 'true',
-      optInPush:   $('#optinPush').value === 'true'
+    // ======= HELPERS =======
+    const $ = sel => document.querySelector(sel);
+    const show = (el, on = true) => el.classList.toggle('show', on);
+    const enableEdit = (on) => {
+      ['firstName','lastName','email','dob','city','zip','statutFid','statutRFM','magasinFav'].forEach(id => {
+        const input = document.getElementById(id);
+        input.readOnly = !on;
+      });
+      ['optinEmail','optinSMS','optinPush'].forEach(id => {
+        const s = document.getElementById(id);
+        s.disabled = !on;
+      });
+      $('#saveBtn').style.display = on ? 'inline-flex' : 'none';
+      $('#editToggle').textContent = on ? 'Annuler' : 'Éditer';
     };
-    await apiPOST(ENDPOINT, payload);
-    // update local cache copy
-    Object.assign(selected, payload);
-    enableEdit(false);
-    alert('Profil mis à jour.');
-  }catch(e){
-    console.error(e); alert('Échec de la mise à jour: '+e.message);
-  }
-});
+    const norm = s => (s||'').toString().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
 
-// ======= NEW CONTACT =======
-const modal = document.getElementById('modal');
-const openModal = (on)=>{ modal.classList.toggle('show', !!on); }
+    // Debounce function
+    function debounce(fn, delay = 300) {
+      let timer;
+      return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+      };
+    }
 
-document.getElementById('newBtn').addEventListener('click', ()=> openModal(true));
-document.querySelector('.modal-backdrop').addEventListener('click', ()=> openModal(false));
-document.getElementById('cancelNew').addEventListener('click', ()=> openModal(false));
+    function highlight(text, term) {
+      if (!term) return text;
+      const reg = new RegExp(`(${term})`, 'gi');
+      return text.replace(reg, '<mark>$1</mark>');
+    }
 
-$('#createNew').addEventListener('click', async ()=>{
-  const payload = {
-    email: $('#n_email').value,
-    firstName: $('#n_firstName').value,
-    lastName:  $('#n_lastName').value,
-    mobile:    $('#n_mobile').value || null,
-    city:      $('#n_city').value || null,
-    zipCode:   $('#n_zip').value || null,
-    optInEmail: $('#n_optinEmail').value === 'true',
-    optInSMS:   $('#n_optinSMS').value === 'true'
-  };
-  if(!payload.email){ alert('Email requis.'); return; }
-  try{
-    await apiPOST(ENDPOINT, payload);
-    cache.unshift(payload); // naïf: on ajoute en tête pour la session
-    openModal(false);
-    q.value = payload.email; // préremplir la recherche
-    renderSuggestions([payload]);
-    alert('Contact créé.');
-  }catch(e){ console.error(e); alert('Échec création: '+e.message); }
-});
-</script>
+    function loading(on = true) {
+      $('#loader').style.display = on ? 'grid' : 'none';
+    }
+
+    async function apiGET(url) {
+      loading(true);
+      try {
+        const res = await fetch(url, { headers: { 'X-API-KEY': API_KEY } });
+        if (!res.ok) throw new Error(await res.text());
+        return res.json();
+      } finally {
+        loading(false);
+      }
+    }
+
+    async function apiPOST(url, payload) {
+      loading(true);
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-API-KEY': API_KEY },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error(await res.text());
+        return res.json();
+      } finally {
+        loading(false);
+      }
+    }
+
+    async function ensureCache() {
+      if (cache.length) return cache;
+      const stored = localStorage.getItem('client_cache');
+      if (stored) {
+        try {
+          cache = JSON.parse(stored);
+          return cache;
+        } catch (e) {
+          console.warn('Failed to parse cache from localStorage', e);
+        }
+      }
+      const data = await apiGET(ENDPOINT + '?limit=1000');
+      cache = (data && data.data) ? data.data : [];
+      try {
+        localStorage.setItem('client_cache', JSON.stringify(cache));
+      } catch (e) {
+        console.warn('Could not save cache to localStorage', e);
+      }
+      return cache;
+    }
+
+    // ======= SEARCH & SUGGESTIONS =======
+    const q = $('#q');
+    const suggest = $('#suggest');
+    const searchwrap = document.querySelector('.searchwrap');
+
+    function closeSuggestions() {
+      suggest.innerHTML = '';
+      suggest.style.display = 'none';
+      q.setAttribute('aria-expanded', 'false');
+    }
+
+    document.addEventListener('click', e => {
+      if (!searchwrap.contains(e.target)) closeSuggestions();
+    });
+
+    q.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        closeSuggestions();
+        q.blur();
+      }
+    });
+
+    q.inputListener = debounce(async e => {
+      const term = norm(e.target.value);
+      if (!term || term.length < 2) {
+        closeSuggestions();
+        return;
+      }
+      await ensureCache();
+      const list = cache.filter(r =>
+        norm(r.email).includes(term) ||
+        norm(r.firstName).includes(term) ||
+        norm(r.lastName).includes(term)
+      ).slice(0, 20);
+      renderSuggestions(list, term);
+    }, 300);
+
+    q.addEventListener('input', q.inputListener);
+
+    function renderSuggestions(list, term = '') {
+      suggest.innerHTML = '';
+      if (!list.length) {
+        closeSuggestions();
+        return;
+      }
+      list.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 's-item';
+        div.innerHTML = `
+          <span class="badge">RCU</span>
+          <div style="flex:1">
+            <div><strong>${highlight(r.firstName || '', term)} ${highlight(r.lastName || '', term)}</strong>
+              · <span class="muted">${highlight(r.email || '', term)}</span></div>
+            <div class="muted">${highlight(r.city || '', term)} ${r.zipCode ? ('· ' + r.zipCode) : ''}</div>
+          </div>`;
+        div.addEventListener('click', () => selectRecord(r));
+        suggest.appendChild(div);
+      });
+      suggest.style.display = 'block';
+      q.setAttribute('aria-expanded', 'true');
+    }
+
+    // ======= SELECT & RENDER =======
+    function selectRecord(r) {
+      selected = r;
+      closeSuggestions();
+      q.value = '';
+      q.blur();
+      $('#emptyState').style.display = 'none';
+      show($('#cardDetails'), true);
+      show($('#cardPurchases'), true);
+
+      $('#firstName').value = r.firstName || '';
+      $('#lastName').value = r.lastName || '';
+      $('#email').value = r.email || '';
+      $('#dob').value = r.dateOfBirth || '';
+      $('#city').value = r.city || '';
+      $('#zip').value = r.zipCode || '';
+      $('#statutFid').value = r.Statut_Fidelite || '';
+      $('#statutRFM').value = r.Statut_RFM || '';
+      $('#magasinFav').value = r.Magasin_favori || '';
+      $('#optinEmail').value = String(r.optInEmail === true);
+      $('#optinSMS').value = String(r.optInSMS === true);
+      $('#optinPush').value = String(r.optInPush === true);
+
+      enableEdit(false);
+
+      const tb = document.querySelector('#purchasesTable tbody');
+      tb.innerHTML = '';
+      const arr = Array.isArray(r['3_derniers_produits_achetes']) ? r['3_derniers_produits_achetes'] : [];
+      if (!arr.length) {
+        document.getElementById('emptyPurchases').style.display = 'flex';
+      } else {
+        document.getElementById('emptyPurchases').style.display = 'none';
+        arr.forEach(p => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${p.Order_date ? new Date(p.Order_date).toLocaleDateString() : ''}</td>
+            <td>${p.product_name || ''}</td>
+            <td><span class="pill">${p.brand || ''}</span></td>
+            <td>${p.category || ''}</td>
+            <td>${p.quantity ?? ''}</td>
+            <td>${typeof p.line_total_ttc === 'number' ? (p.line_total_ttc.toFixed(2) + ' €') : ''}</td>`;
+          tb.appendChild(tr);
+        });
+      }
+    }
+
+    // ======= EDIT / SAVE =======
+    $('#editToggle').addEventListener('click', () => {
+      const editing = $('#saveBtn').style.display !== 'none';
+      enableEdit(!editing);
+    });
+
+    function validateEmail(email) {
+      return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
+    }
+
+    $('#saveBtn').addEventListener('click', async () => {
+      if (!selected) return;
+      const payload = {
+        email: $('#email').value,
+        firstName: $('#firstName').value,
+        lastName: $('#lastName').value,
+        dateOfBirth: $('#dob').value || null,
+        city: $('#city').value || null,
+        zipCode: $('#zip').value || null,
+        RFM: $('#statutRFM').value || null,
+        optInEmail: $('#optinEmail').value === 'true',
+        optInSMS: $('#optinSMS').value === 'true',
+        optInPush: $('#optinPush').value === 'true'
+      };
+      if (!validateEmail(payload.email)) {
+        alert('Adresse email invalide.');
+        return;
+      }
+      try {
+        await apiPOST(ENDPOINT, payload);
+        Object.assign(selected, payload);
+        enableEdit(false);
+        alert('Profil mis à jour.');
+        // update localStorage too
+        localStorage.setItem('client_cache', JSON.stringify(cache));
+      } catch (e) {
+        console.error(e);
+        alert('Échec de la mise à jour: ' + e.message);
+      }
+    });
+
+    // ======= NEW CONTACT =======
+    const modal = document.getElementById('modal');
+    function openModal(on) {
+      modal.classList.toggle('show', !!on);
+    }
+
+    document.getElementById('newBtn').addEventListener('click', () => openModal(true));
+    document.querySelector('.modal-backdrop').addEventListener('click', () => openModal(false));
+    document.getElementById('cancelNew').addEventListener('click', () => openModal(false));
+
+    $('#createNew').addEventListener('click', async () => {
+      const payload = {
+        email: $('#n_email').value,
+        firstName: $('#n_firstName').value,
+        lastName: $('#n_lastName').value,
+        mobile: $('#n_mobile').value || null,
+        city: $('#n_city').value || null,
+        zipCode: $('#n_zip').value || null,
+        optInEmail: $('#n_optinEmail').value === 'true',
+        optInSMS: $('#n_optinSMS').value === 'true'
+      };
+      if (!payload.email) {
+        alert('Email requis.');
+        return;
+      }
+      if (!validateEmail(payload.email)) {
+        alert('Adresse email invalide.');
+        return;
+      }
+      try {
+        await apiPOST(ENDPOINT, payload);
+        // Add newly created contact to cache
+        cache.unshift(payload);
+        localStorage.setItem('client_cache', JSON.stringify(cache));
+        openModal(false);
+        q.value = payload.email;
+        renderSuggestions([payload], norm(payload.email));
+        alert('Contact créé.');
+      } catch (e) {
+        console.error(e);
+        alert('Échec création: ' + e.message);
+      }
+    });
+  </script>
 </body>
 </html>
